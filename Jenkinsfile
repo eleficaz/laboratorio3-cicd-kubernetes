@@ -70,12 +70,17 @@ stages {
 
 
 	stage('deploy') {
-		steps {
-			container('kubectl') {
-				sh 'echo "Hola Jenkins"'
-			}
-		}
-	}
+    steps {
+        container('kubectl') {
+            sh '''
+                echo "Hola Jenkins"
+                uname -a
+                pwd
+                ls -la
+            '''
+        }
+    }
+}
 
 
 }
