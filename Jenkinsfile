@@ -67,7 +67,7 @@ stages {
 //            }
 //        }
 //    }
-}
+
 
 	stage('deploy') {
 		steps {
@@ -76,6 +76,11 @@ stages {
 			}
 		}
 	}
+
+
+}
+
+	
 
 post {
 
