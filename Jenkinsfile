@@ -1,6 +1,5 @@
 pipeline {
 
-```
 agent {
     kubernetes {
         yamlFile 'agent.yaml'
@@ -80,6 +79,6 @@ post {
         echo 'Pipeline finalizado con errores'
     }
 }
-```
+
 
 }
