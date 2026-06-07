@@ -1,0 +1,69 @@
+version: "3.8"
+
+
+services:
+  frontend:
+    image: front:latest
+    restart: always
+    ports:
+      - "8080:80"
+    networks:
+      - tarea1-network
+
+
+  backend:
+    image: backend:latest
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: always
+    networks:
+      - tarea1-network
+
+
+
+  db-app:
+    image: postgres:18
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "512M"
+        # Los reservation solo aplican para swarm, pero so validos aca
+        reservations:
+          cpus: "2"
+          memory: "256M"
+    networks:
+      - tarea1-network
+
+networks:
+  tarea1-network:
+    driver: bridge
+volumes:
+  db_data:

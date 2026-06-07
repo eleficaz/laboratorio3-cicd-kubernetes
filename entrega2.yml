@@ -1,0 +1,210 @@
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-juan-rojas
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-juan-rojas
+  namespace: ns-juan-rojas
+data:
+  AMBIENTE: "PRODUCCION"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-juan-rojas
+  namespace: ns-juan-rojas
+type: Opaque
+stringData:
+  API_KEY: "laboratorio-2026"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-juan-rojas
+  namespace: ns-juan-rojas
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-juan-rojas
+  namespace: ns-juan-rojas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+
+    spec:
+      containers:
+        - name: postgres
+
+          image: postgres:16
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+
+            - name: POSTGRES_PASSWORD
+              value: postgres
+
+            - name: POSTGRES_DB
+              value: usuarios_db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-juan-rojas-back
+  namespace: ns-juan-rojas
+
+spec:
+  selector:
+    app: backend
+
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-juan-rojas-back
+  namespace: ns-juan-rojas
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: backend
+
+          image: jarojaslv/lab3-backend:juan-rojas
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3000
+
+          env:
+            - name: PORT
+              value: "3000"
+
+            - name: DB_HOST
+              value: postgres-juan-rojas
+
+            - name: DB_PORT
+              value: "5432"
+
+            - name: POSTGRES_USER
+              value: postgres
+
+            - name: POSTGRES_PASSWORD
+              value: postgres
+
+            - name: POSTGRES_DB
+              value: usuarios_db
+
+            - name: AMBIENTE
+              valueFrom:
+                configMapKeyRef:
+                  name: config-juan-rojas
+                  key: AMBIENTE
+
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-juan-rojas
+                  key: API_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-juan-rojas-front
+  namespace: ns-juan-rojas
+
+spec:
+  selector:
+    app: frontend
+
+  ports:
+    - port: 80
+      targetPort: 80
+
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-juan-rojas-front
+  namespace: ns-juan-rojas
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+        - name: frontend
+
+          image: jarojaslv/lab3-frontend:juan-rojas
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 80
+
+          env:
+            - name: AMBIENTE
+              valueFrom:
+                configMapKeyRef:
+                  name: config-juan-rojas
+                  key: AMBIENTE
+
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-juan-rojas
+                  key: API_KEY
+
