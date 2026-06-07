@@ -2,21 +2,15 @@ apiVersion: v1
 kind: Pod
 
 metadata:
-labels:
-app: jenkins-agent
+  labels:
+    app: jenkins-agent
 
 spec:
+  serviceAccountName: jenkins
 
-serviceAccountName: jenkins
-
-containers:
-
-* name: kubectl
-
-  image: bitnami/kubectl:latest
-
-  command:
-
-  * cat
-
-  tty: true
+  containers:
+    - name: kubectl
+      image: bitnami/kubectl:latest
+      command:
+        - cat
+      tty: true
