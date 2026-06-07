@@ -67,7 +67,7 @@ stages {
 //            }
 //        }
 //    }
-//}
+}
 
 	stage('deploy') {
 		steps {
