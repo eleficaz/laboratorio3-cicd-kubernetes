@@ -69,13 +69,13 @@ stages {
 //    }
 //}
 
-stage('deploy') {
-    steps {
-        container('kubectl') {
-            sh 'echo "Hola Jenkins"'
-        }
-    }
-}
+	stage('deploy') {
+		steps {
+			container('kubectl') {
+				sh 'echo "Hola Jenkins"'
+			}
+		}
+	}
 
 post {
 
