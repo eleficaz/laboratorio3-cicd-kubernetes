@@ -52,21 +52,33 @@ stages {
         }
     }
 
-   stage('deploy') {
-       steps {
+//   stage('deploy') {
+//       steps {
+//
+//           container('kubectl') {
+//
+//               sh '''
+//                kubectl apply -f entrega.yaml
+//
+//               kubectl rollout status deployment/app-juan-rojas-back -n ns-juan-rojas
+//
+//                kubectl rollout status deployment/app-juan-rojas-front -n ns-juan-rojas
+//                '''
+//            }
+//        }
+//    }
 
-           container('kubectl') {
 
-               sh '''
-                kubectl apply -f entrega.yaml
-
-               kubectl rollout status deployment/app-juan-rojas-back -n ns-juan-rojas
-
-                kubectl rollout status deployment/app-juan-rojas-front -n ns-juan-rojas
-                '''
-            }
+stage('deploy') {
+    steps {
+        container('kubectl') {
+            sh '''
+                which kubectl
+                kubectl version --client
+            '''
         }
     }
+}
 
 
 }
