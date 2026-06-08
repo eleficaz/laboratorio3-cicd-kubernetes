@@ -58,7 +58,7 @@ stages {
            container('kubectl') {
 
                sh '''
-                kubectl apply -f entrega2.yaml
+                kubectl apply -f entrega2.yml
 
                kubectl rollout status deployment/app-juan-rojas-back -n ns-juan-rojas
 
